@@ -2,11 +2,6 @@ import { fileURLToPath, URL } from "url";
 
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import UnoCSS from 'unocss/vite'
-import { presetExtra } from 'unocss-preset-extra';
-import presetWind from '@unocss/preset-wind';
-import presetAttributify from '@unocss/preset-attributify'
-import { presetTypography } from "@unocss/preset-typography";
 
 // 依赖组件自动引入
 import Components from "unplugin-vue-components/vite";
@@ -18,13 +13,6 @@ export default defineConfig({
   // base:"https://s-sh-2164-bangumi.oss.dogecdn.com/",
   plugins: [
     vue(),
-    UnoCSS({
-      presets: [
-      presetWind(),
-      presetAttributify(), // required if using attributify mode
-      presetTypography(),
-      presetExtra(),
-  ], /* options */ }),
     Components({
       resolvers: [NaiveUiResolver()],
     }),
