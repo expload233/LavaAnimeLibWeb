@@ -1,9 +1,20 @@
-<script>
+<script setup lang="ts">
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 
-export default {
-  name: 'ReloadPrompt',
-  mixins: [useRegisterSW]
+const {
+  offlineReady,
+  needRefresh,
+  updateServiceWorker,
+} = useRegisterSW({
+  onRegisteredSW(swUrl) {
+    // eslint-disable-next-line no-console
+    console.log(`Service Worker at: ${swUrl}`)
+  },
+})
+
+const close = async () => {
+  offlineReady.value = false
+  needRefresh.value = false
 }
 </script>
 
@@ -15,10 +26,10 @@ export default {
   >
     <div class="message">
       <span v-if="offlineReady">
-        熔岩番剧库已离线可用.
+        熔岩番剧库现已离线可用.
       </span>
       <span v-else>
-        新更新可用,重载以可用.
+        有新更新可用,重载以更新.
       </span>
     </div>
     <button v-if="needRefresh" @click="updateServiceWorker()">
@@ -41,7 +52,7 @@ export default {
   border-radius: 4px;
   z-index: 1;
   text-align: left;
-  box-shadow: 3px 4px 5px 0 #8885;
+  box-shadow: 3px 4px 5px 0px #8885;
 }
 .pwa-toast .message {
   margin-bottom: 8px;
