@@ -18,7 +18,7 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: "prompt",
-      injectRegister: "auto"
+      injectRegister: "auto",
       includeAssets: ["favicon.ico", "icon.svg", "apple-touch-icon.png"],
       manifest: {
         name: "熔岩番剧库",
