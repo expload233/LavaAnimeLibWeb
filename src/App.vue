@@ -1,6 +1,6 @@
 <script>
 import View from "./views/View.vue";
-import ReloadPrompt from './components/ReloadPrompt.vue';
+import {ReloadPrompt} from "./components/ReloadPrompt.vue";
 
 export default {
   data() {
