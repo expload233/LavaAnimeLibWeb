@@ -17,7 +17,8 @@ export default defineConfig({
       resolvers: [NaiveUiResolver()],
     }),
     VitePWA({
-      registerType: "autoUpdate",
+      registerType: "prompt",
+      injectRegister: "auto"
       includeAssets: ["favicon.ico", "icon.svg", "apple-touch-icon.png"],
       manifest: {
         name: "熔岩番剧库",
@@ -39,7 +40,6 @@ export default defineConfig({
         ],
       },
       workbox: {
-        cleanupOutdatedCaches: true,
         globPatterns: ["**/*.{js,css,ico,png,svg}"],
       },
       devOptions: {
