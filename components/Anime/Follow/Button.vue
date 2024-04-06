@@ -1,8 +1,13 @@
 <template>
-  <div>
+  <div class="ml-4">
     <NDropdown trigger="click" :options="menuOptions" @select="handleSelect">
       <div>
-        <NButton secondary v-if="followInfo.status >= 0" :loading="loading">
+        <NButton
+          secondary
+          size="small"
+          v-if="followInfo.status >= 0"
+          :loading="loading"
+        >
           <template #icon>
             <NIcon>
               <Icon icon="material-symbols:bookmark-remove" />
@@ -13,6 +18,7 @@
         <NButton
           secondary
           type="primary"
+          size="small"
           v-if="followInfo.status === -1"
           :loading="loading"
         >
@@ -24,9 +30,9 @@
       </div>
     </NDropdown>
     <NSkeleton
-      :width="80"
+      :width="72"
       :sharp="false"
-      size="medium"
+      size="small"
       v-if="Object.keys(followInfo).length === 0"
     />
   </div>
@@ -34,7 +40,7 @@
 
 <script setup lang="ts">
 const { animeId } = defineProps({
-  animeId: { type: Number },
+  animeId: { type: [Number], require: true },
 });
 
 const followInfo: Ref<any> = ref({});
