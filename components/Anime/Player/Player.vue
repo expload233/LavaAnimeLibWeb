@@ -219,5 +219,7 @@ onMounted(() => {
 .art-mobile > .art-bottom > .art-controls {
   padding-right: 10px !important;
   padding-left: 10px !important;
+  touch-callout:none;
+  -webkit-touch-callout:none;
 }
 </style>
