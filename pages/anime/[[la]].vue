@@ -72,7 +72,7 @@ useHead({
       store.animeData?.title &&
       store.activeFile?.parseResult?.episode
     ) {
-      return `${store.animeData?.title} 第${store.activeFile.parseResult.episode}话`;
+      return `${store.animeData?.title} 第${store.activeFile.parseResult?.episode}话`;
     }
   }),
 });
@@ -114,6 +114,15 @@ const isMobileOpenDetails = ref(false);
     </DevOnly>
     <!-- (模态框等) DOM 位置无关组件 -->
     <AnimeAdminTool />
+    <!-- 文件浏览器模态框 -->
+    <NModal
+      v-model:show="store.isFileBrowserOpen"
+      preset="card"
+      title="链接复制工具"
+      style="max-width: 1024px"
+    >
+      <AnimeFileBrowser />
+    </NModal>
     <!-- PC 端主视图，Grid 布局，仅在 lg 以上可用 -->
     <div
       class="grid grid-cols-3 gap-6 w-full"
@@ -130,13 +139,20 @@ const isMobileOpenDetails = ref(false);
           <AnimePlayerEmpty v-if="!store.showArtPlayer" />
         </div>
         <!-- 本地播放器调用 -->
-        <AnimePlayerActionBar />
+        <AnimeCardBasic>
+          <div class="flex flex-col gap-2">
+            <AnimeSubtitleControl />
+            <AnimePlayerActionBar />
+          </div>
+        </AnimeCardBasic>
         <!-- 番剧卡 -->
         <AnimeMetaCard />
       </NFlex>
       <!-- 右视图 占一列 -->
       <NFlex vertical :size="16" class="col-span-1">
         <AnimeDriveSelector />
+        <!-- 番剧公告（V2）临时 -->
+        <AnimeNotice />
         <AnimeFileList />
         <AnimeFileErrorDisplay />
         <!-- 关联作品 -->
@@ -156,17 +172,8 @@ const isMobileOpenDetails = ref(false);
         <AnimePlayerEmpty v-if="!store.showArtPlayer" />
       </div>
 
-      <NCard
-        size="small"
-        content-style="padding: 0;"
-        :bordered="false"
-        class="overflow-clip sm:rounded-t-md"
-      >
-        <NTabs type="line" :tabs-padding="20">
-          <NTab name="anime" @click="currentMobilePage = 'anime'"> 番剧 </NTab>
-        </NTabs>
-      </NCard>
-
+      <!-- 番剧公告（V2）临时 -->
+      <AnimeNotice />
       <!-- 番剧卡-->
       <AnimeMetaCardMini @open-details="isMobileOpenDetails = true" />
       <NDrawer
@@ -184,7 +191,12 @@ const isMobileOpenDetails = ref(false);
         </NDrawerContent>
       </NDrawer>
       <!-- 本地播放器调用 -->
-      <AnimePlayerActionBar />
+      <AnimeCardBasic>
+        <div class="flex flex-col gap-2">
+          <AnimeSubtitleControl />
+          <AnimePlayerActionBar />
+        </div>
+      </AnimeCardBasic>
       <AnimeDriveSelector />
       <AnimeFileList />
       <AnimeFileErrorDisplay />

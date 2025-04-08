@@ -11,14 +11,63 @@
 
 <script setup>
 import Artplayer from "artplayer";
-import { useLocalStorage, useThrottleFn } from "@vueuse/core";
-import canAutoplay from "can-autoplay";
+import SubtitlesOctopus from "libass-wasm/dist/js/subtitles-octopus.js";
+import { useLocalStorage, useThrottleFn, watchDebounced } from "@vueuse/core";
 
 const store = useAnimeStore();
 const message = useMessage();
+const notification = useNotification();
 const refreshPlayer = inject("refreshPlayer");
+const route = useRoute();
 
 const rememberRate = useLocalStorage("rememberRate", false);
+
+let subtitleInstance = null;
+
+const createSubtitles = async (subtitleFile) => {
+  const content = await fetch(subtitleFile.url).then((res) => res.text());
+  const assContent = subtitleFile.name.match(/.srt$/i)
+    ? srtToAss(content)
+    : content;
+
+  subtitleInstance = new SubtitlesOctopus({
+    video: store.artInstance.video,
+    subContent: assContent,
+    workerUrl: "/libass-wasm/subtitles-octopus-worker.js",
+    fallbackFont: "/libass-wasm/default.woff2",
+    canvasStyle: {
+      willReadFrequently: true,
+    },
+    width: 1280,
+    height: 720,
+    debug: true,
+    targetFps: 24,
+    renderMode: "wasm-blend",
+    onError: function (error) {
+      console.error("Subtitle Error:", error);
+    },
+  });
+};
+
+const disposeSubtitles = () => {
+  if (subtitleInstance) {
+    subtitleInstance.dispose();
+    subtitleInstance = null;
+    const canvas = document.querySelector("#artContainer canvas");
+    if (canvas) {
+      canvas.style.display = "none";
+    }
+  }
+};
+
+// 每次字幕变化时，都更新字幕
+watch(
+  () => store.activeSubtitle,
+  (subtitleFile) => {
+    disposeSubtitles();
+    createSubtitles(subtitleFile);
+  }
+);
 
 onMounted(() => {
   const options = {
@@ -62,7 +111,12 @@ onMounted(() => {
         tooltip: "下一话",
         click: useThrottleFn(function () {
           const newEp = store.findNextEpisode();
-          if (newEp) store.changeEpisode(newEp);
+          console.log("切换集数:", newEp);
+          if (newEp) {
+            store.changeEpisode(newEp).catch((err) => {
+              console.error("切换集数失败:", err);
+            });
+          }
         }, 1000),
       },
     ],
@@ -72,7 +126,7 @@ onMounted(() => {
   store.artInstance = artInstance;
 
   // 监听文件变化情况
-  watch(
+  watchDebounced(
     () => store.activeFile,
     async (newFile) => {
       if (!newFile?.url) return;
@@ -83,31 +137,11 @@ onMounted(() => {
         message.error("播放失败, 正在重试");
       }
 
-      // 寻找并生效字幕
-      let subtitles = store.fileData.fileList.filter((file) => {
-        if (file?.parseResult?.extensionName.type == "subtitle") {
-          if (
-            file?.parseResult?.episode ==
-              store.activeFile?.parseResult.episode ||
-            file.name.startsWith(
-              store.activeFile.parseResult.extensionName.trueName
-            )
-          ) {
-            return true;
-          }
-        }
-      });
-      console.log("找到字幕", subtitles);
-
-      if (subtitles.length) {
-        artInstance.subtitle.url = subtitles[0].url;
-      }
-
       if (newFile?.parseResult?.extensionName?.type == "music") {
         message.info(`正在播放音乐 ${newFile?.name}`);
       }
     },
-    { immediate: true }
+    { immediate: true, debounce: 500 }
   );
 
   // 播放器出错损坏处理
@@ -126,9 +160,15 @@ onMounted(() => {
   const reportPlaying = () => {
     if (
       !store.artInstance?.duration ||
-      store.activeFile?.parseResult?.extensionName.type != "video"
-    )
+      store.activeFile?.parseResult?.extensionName?.type != "video"
+    ) {
       return;
+    }
+    if (route.query?.noReport) {
+      console.log("由于路由含 noReport 参数，不会进行播放历史上报");
+      return;
+    }
+
     store.reportView(true, "WebPlayer");
   };
 
@@ -147,7 +187,16 @@ onMounted(() => {
       } else {
         artInstance.muted = true;
         artInstance.play();
-        message.info("已为您静音开播, 可手动解除静音");
+
+        notification.create({
+          type: "info",
+          title: "静音播放",
+          description: "因浏览器限制，本次自动播放为静音，关闭此消息恢复。",
+          onClose: () => {
+            artInstance.muted = false;
+          },
+          duration: 10000,
+        });
       }
     }, 200);
   });
@@ -221,5 +270,11 @@ onMounted(() => {
   padding-left: 10px !important;
   touch-callout:none;
   -webkit-touch-callout:none;
+}
+
+/* 字幕画布样式 */
+#artContainer canvas {
+  z-index: 20;
+  pointer-events: none;
 }
 </style>

@@ -4,7 +4,7 @@ export default {
     return {
       searchValue: "",
       selectedTab: {
-        year: "2024年",
+        year: "2025年",
         type: "4月春",
       },
       tabs: { year: [], type: [] },

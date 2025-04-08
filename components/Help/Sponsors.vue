@@ -11,8 +11,8 @@
             @click="sponsor.showModal = true"
           />
 
-          <n-modal v-model:show="sponsor.showModal">
-            <n-card
+          <NModal v-model:show="sponsor.showModal">
+            <NCard
               style="max-width: 400px"
               :title="sponsor.name"
               :bordered="false"
@@ -27,12 +27,12 @@
               </template>
               <p v-html="sponsor.message"></p>
               <template #action>
-                <n-a v-if="sponsor.link" :href="sponsor.link" target="_blank"
-                  >查看附加的链接</n-a
+                <NA v-if="sponsor.link" :href="sponsor.link" target="_blank"
+                  >查看附加的链接</NA
                 >
               </template>
-            </n-card>
-          </n-modal>
+            </NCard>
+          </NModal>
         </template>
       </div>
     </div>
@@ -52,22 +52,43 @@ export default {
           link: "https://arthals.ink/",
         },
         {
+          name: "若葉",
+          support: "其他",
+          message: "提供数年期的域名赞助",
+          link: "https://loliloli.moe/",
+        },
+        {
           name: "czy0729",
           support: "￥367.98",
           message: "(包含非番剧库赞助)",
           link: "https://github.com/czy0729",
         },
-        { name: "小林", support: "￥300.00" },
-        { name: "Longtianmu", support: "￥240", link: "https://ltm.ink/" },
-        {
-          name: "MicTimo",
-          support: "￥66.00",
-        },
         {
           name: "纯之",
           support: "其他",
-          message: "提供部分网页和视频的加速服务节点",
+          message: "提供 Google Drive 相关节点支持",
           link: "https://moe.tips/",
+        },
+        {
+          name: "晓空",
+          support: "其他",
+          message: "自24年10月起提供本地节点香港线路支持",
+          link: "https://moeworld.tech/",
+        },
+        { name: "小林", support: "￥300.00" },
+        { name: "Longtianmu", support: "￥240.00" },
+        { name: "Lozyue", support: "￥168.00" },
+        {
+          name: "M***h",
+          support: "￥66.60",
+        },
+        {
+          name: "刻舟－求劍",
+          support: "￥66.60",
+        },
+        {
+          name: "MicTimo",
+          support: "￥66.00",
         },
         {
           name: "林恩 Lynn.",
@@ -76,10 +97,8 @@ export default {
           link: "https://blog.lynn6.cn/",
         },
         {
-          name: "若葉",
-          support: "其他",
-          message: "提供新域名等支持",
-          link: "https://loliloli.moe/",
+          name: "Ender_DeerOVO",
+          support: "￥50.00",
         },
         {
           name: "XJH_Jorhai",
